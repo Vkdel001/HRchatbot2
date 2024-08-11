@@ -1,0 +1,56 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedchain Chatbot</title>
+</head>
+<body>
+    <h1>Upload PDF and Query Chatbot</h1>
+    
+    <!-- Form to upload files -->
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".pdf">
+        <button type="submit">Upload PDF</button>
+    </form>
+    
+    <br>
+
+    <!-- Form to submit queries -->
+    <form id="query-form">
+        <input type="text" name="question" placeholder="Ask a question">
+        <button type="submit">Ask</button>
+    </form>
+
+    <!-- Display bot response -->
+    <div id="response"></div>
+
+    <script>
+        // Handle file upload
+        document.getElementById('upload-form').onsubmit = async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('response').innerText = result.success || result.error;
+        };
+
+        // Handle bot queries
+        document.getElementById('query-form').onsubmit = async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = await fetch('/query', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById('response').innerText = result.response || result.error;
+        };
+    </script>
+</body>
+</html>
