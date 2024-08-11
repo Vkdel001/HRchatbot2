@@ -1,7 +1,5 @@
-# app.py
-
-from flask import Flask, request, render_template, jsonify
 import os
+from flask import Flask, request, render_template, jsonify
 from embedchain import App
 from dotenv import load_dotenv
 
@@ -12,8 +10,13 @@ load_dotenv()
 app = Flask(__name__)
 
 # Initialize Embedchain bot
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")  # Load API key from environment
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 elon_bot = App()
+
+# Ensure the uploads directory exists
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # Route for the home page with the upload form
 @app.route('/')
@@ -32,10 +35,10 @@ def upload_file():
         return jsonify({"error": "No file selected for uploading"}), 400
     
     # Save the file to the server
-    file_path = os.path.join('uploads', file.filename)
-    file.save(file_path)
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
     
     try:
+        file.save(file_path)
         # Add the PDF file to the bot
         elon_bot.add("pdf_file", file_path)
         return jsonify({"success": f"File {file.filename} successfully uploaded and added to the bot"}), 200
